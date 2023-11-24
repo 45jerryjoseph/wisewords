@@ -1,0 +1,30 @@
+{
+  "canisters": {
+    "wisewords_backend": {
+      "candid": "src/wisewords_backend/wisewords_backend.did",
+      "package": "wisewords_backend",
+      "type": "rust"
+    },
+    "wisewords_frontend": {
+      "dependencies": [
+        "wisewords_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/wisewords_frontend/src/index.html"
+      },
+      "source": [
+        "src/wisewords_frontend/assets",
+        "dist/wisewords_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
