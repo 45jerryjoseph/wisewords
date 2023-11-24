@@ -1,3 +1,43 @@
+type Contributor = record {
+  id : nat64;
+  age : nat32;
+  updated_at : opt nat64;
+  username : text;
+  created_at : nat64;
+  email : text;
+};
+type ContributorPayload = record { age : nat32; username : text; email : text };
+type Error = variant { NotFound : record { msg : text } };
+type Quote = record {
+  id : nat64;
+  updated_at : opt nat64;
+  "text" : text;
+  created_at : nat64;
+  author : text;
+  category : text;
+  contributor_id : nat64;
+};
+type QuotePayload = record {
+  "text" : text;
+  author : text;
+  category : text;
+  contributor_id : nat64;
+};
+type Result = variant { Ok : Contributor; Err : Error };
+type Result_1 = variant { Ok : Quote; Err : Error };
+type Result_2 = variant { Ok : vec Contributor; Err : Error };
+type Result_3 = variant { Ok : vec Quote; Err : Error };
 service : {
-    "greet": (text) -> (text) query;
+  add_contributor : (ContributorPayload) -> (opt Contributor);
+  add_quote : (QuotePayload) -> (opt Quote);
+  delete_contributor : (nat64) -> (Result);
+  delete_quote : (nat64) -> (Result_1);
+  get_all_contributors : () -> (Result_2) query;
+  get_all_quotes : () -> (Result_3) query;
+  get_contributor : (nat64) -> (Result) query;
+  get_quote : (nat64) -> (Result_1) query;
+  get_quotes_by_category : (text) -> (Result_3) query;
+  get_recent_quotes : () -> (Result_3) query;
+  update_contributor : (nat64, ContributorPayload) -> (Result);
+  update_quote : (nat64, QuotePayload) -> (Result_1);
 }

@@ -1,10 +1,86 @@
-# wisewords
+# Wisewords
 
-Welcome to your new wisewords project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+**Problem Statement**:
+
+For an Aim to  seek to manage a repository of quotes contributed by various individuals. **Wisewords** system aims to facilitate the collection, organization, and retrieval of these quotes and contributor details.
+
+The system aims to inspire and create awareness as well as a smile to  those viewing by even starting the day with a Quote 
+
+The Contributor explores to come up with more Quotes, and bring to lime light the quotes which Can be placed in Categories such as :
+ - **Funny  quotes**  
+ - **friendship quotes** 
+ - **Motivational quotes**
+ - **leadership quotes**
+
 
 To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
 
-To learn more before you start working with wisewords, see the following documentation available online:
+## Overview
+The code includes structures and methods to manage contributors and quotes within a system. It utilizes the Internet Computer's APIs and libraries for memory management, CRUD operations, and error handling.
+
+External Dependencies
+  
+  - **Serde**: External crate for serialization and deserialization.
+  - **Candid**: Used for encoding and decoding types.
+  - **ic_cdk**: Provides access to Internet Computer APIs.
+  - **ic_stable_structures**: Includes memory management functionalities.
+  - **std**: Standard Rust library components.
+
+## Structures
+
+`Contributor`
+
+- Represents a contributor with the fields for `id`, `username`, `email`, `age`, `created_at` and `updated_at`
+
+`Quote`
+
+- Represents a quote with fields for `id`,`contributor_id`,`author`, `text`, `category`, `created_at` and `updated_at`
+
+
+## Storable Traits
+
+Both `Contributor `and `Quote` implement the `Storable` and `BoundedStorable `traits to manage serialization and storage size limits.
+
+## Local Variables 
+
+  - **Memory Manager** : Handles memory management.
+  - **QUOTE_ID_COUNTER**: Manages unique IDs for  quotes.
+  - **CONTRIBUTOR_ID_COUNTER**: Manages unique IDs for contributors.
+  - **CONTRIBUTOR_STORAGE**: Stores contributors.
+  - **QUOTE_STORAGE**: Stores quotes.
+
+## Payload Structures
+  - ContributorPayload: Struct to hold contributor information for CRUD operations.
+  - QuotePayload: Struct to hold quote information for CRUD operations.
+
+## Contributor Operations
+
+  - `get_all_contributors()`: Retrieves all contributors.
+  - `get_contributor(id: u64)`: Retrieves a specific contributor by ID.
+  - `add_contributor(contrib: ContributorPayload)`: Adds a new contributor.
+  - `update_contributor(id: u64, payload: ContributorPayload)`:   - Updates contributor information.
+  - `delete_contributor(id: u64)`: Deletes a contributor by ID.
+
+## Quote Operations
+
+  - `get_all_quotes()`: Retrieves all quotes.
+  - `get_quote(id: u64)`: Retrieves a specific quote by ID.
+  - `get_recent_quotes()`: Retrieves the most recent quotes.
+  - `get_quotes_by_category(category: String)`: Retrieves quotes by a specified category.
+  - `add_quote(quotepayload: QuotePayload)`: Adds a new quote.
+  - `update_quote(id: u64, payload: QuotePayload)`: Updates quote information.
+  - `delete_quote(id: u64):` Deletes a quote by ID.
+
+
+## Error Handling 
+
+  - Defines an `Error` enum to handle 'Not Found' cases for cleaner error messages.
+
+## Candid Inergration 
+  -   Exports the code to generate Candid interface.
+
+
+To learn more before you start working with Wisewords, see the following documentation available online:
 
 - [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
 - [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
@@ -16,7 +92,7 @@ To learn more before you start working with wisewords, see the following documen
 If you want to start working on your project right away, you might want to try the following commands:
 
 ```bash
-cd wisewords/
+cd Wisewords/
 dfx help
 dfx canister --help
 ```
