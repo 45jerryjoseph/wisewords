@@ -113,6 +113,63 @@ struct QuotePayload {
 // Contributer CRUD
 
 // get all contributors
+
+use regex::Regex;
+
+fn is_valid_email(email: &str) -> bool {
+    let email_regex = Regex::new(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
+    email_regex.is_match(email)
+}
+
+fn is_valid_username(username: &str) -> bool {
+    let username_regex = Regex::new(r"^\w{1,20}$").unwrap();
+    username_regex.is_match(username)
+}
+
+fn is_valid_age(age: u32) -> bool {
+    age <= 150
+}
+
+fn validate_contributor(contributor: &Contributor) -> Result<(), String> {
+    if !is_valid_username(&contributor.username) {
+        return Err("Invalid username".into());
+    }
+    if !is_valid_email(&contributor.email) {
+        return Err("Invalid email format".into());
+    }
+    if !is_valid_age(contributor.age) {
+        return Err("Invalid age".into());
+    }
+    Ok(())
+}
+
+fn is_valid_text_field(field: &str) -> bool {
+    !field.is_empty() && field.len() <= 100
+}
+
+fn is_valid_contributor_id(id: u64) -> bool {
+    // Assuming a function exists that checks if the contributor ID is valid
+    // For example, check if the ID exists in the contributor storage
+    // exists_contributor_id(id)
+    true // Replace this with actual validation
+}
+
+fn validate_quote(quote: &Quote) -> Result<(), String> {
+    if !is_valid_text_field(&quote.author) {
+        return Err("Invalid author".into());
+    }
+    if !is_valid_text_field(&quote.text) {
+        return Err("Invalid text".into());
+    }
+    if !is_valid_text_field(&quote.category) {
+        return Err("Invalid category".into());
+    }
+    if !is_valid_contributor_id(quote.contributor_id) {
+        return Err("Invalid contributor ID".into());
+    }
+    Ok(())
+}
+
 #[ic_cdk::query]
 fn get_all_contributors() -> Result<Vec<Contributor>, Error>{
     let contributors_map: Vec<(u64,Contributor)> = CONTRIBUTOR_STORAGE.with(|service| service.borrow().iter().collect());
@@ -143,24 +200,33 @@ fn _get_contributor(id: &u64) -> Option<Contributor> {
 }
 
 #[ic_cdk::update]
-fn add_contributor(contrib: ContributorPayload) -> Option<Contributor> {
-    let id = CONTRIBUTOR_ID_COUNTER
-        .with(|counter| {
-            let current_value = *counter.borrow().get();
-            counter.borrow_mut().set(current_value + 1)
-        })
-        .expect("cannot increment id counter");
-    let contributor = Contributor{ 
-        id, 
+fn add_contributor(contrib: ContributorPayload) -> Result<Contributor, String> {
+    let mut contributor = Contributor { 
+        id: 0, // Temporarily set to 0, will be updated after validation
         username: contrib.username,
         email: contrib.email,
         age: contrib.age, 
         created_at: time(), 
         updated_at: None 
     };
+
+    // Validate the contributor data
+    validate_contributor(&contributor)?;
+
+    // Assign a unique ID to the contributor
+    contributor.id = CONTRIBUTOR_ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
+    // Insert the contributor into storage
     do_insert_contributor(&contributor);
-    Some(contributor)
+
+    Ok(contributor)
 }
+
 
 #[ic_cdk::update]
 fn update_contributor(id: u64, payload: ContributorPayload) -> Result<Contributor, Error> {
@@ -285,27 +351,47 @@ fn get_recent_quotes() -> Result<Vec<Quote>, Error> {
   
 
 
-#[ic_cdk::update]
-
-fn add_quote(quotepayload: QuotePayload) -> Option<Quote> {
-    let id = QUOTE_ID_COUNTER
-        .with(|counter| {
-            let current_value = *counter.borrow().get();
-            counter.borrow_mut().set(current_value + 1)
-        })
-        .expect("cannot increment id counter");
-    let quote = Quote { 
-        id,
-        contributor_id: quotepayload.contributor_id, 
-        author: quotepayload.author, 
-        text: quotepayload.text, 
-        category: quotepayload.category, 
-        created_at: time(), 
-        updated_at: None 
-    };
-    do_insert_quote(&quote);
-    Some(quote)
-}
+  #[ic_cdk::update]
+  fn add_quote(quotepayload: QuotePayload) -> Result<Quote, String> {
+      // Create a temporary Quote instance for validation
+      let temp_quote = Quote { 
+          id: 0, // Temporarily set to 0, will be updated after validation
+          contributor_id: quotepayload.contributor_id,
+          author: quotepayload.author.clone(),
+          text: quotepayload.text.clone(),
+          category: quotepayload.category.clone(),
+          created_at: time(), 
+          updated_at: None 
+      };
+  
+      // Validate the quote data
+      validate_quote(&temp_quote)?;
+  
+      // Assign a unique ID to the quote
+      let id = QUOTE_ID_COUNTER
+          .with(|counter| {
+              let current_value = *counter.borrow().get();
+              counter.borrow_mut().set(current_value + 1)
+          })
+          .expect("cannot increment id counter");
+  
+      // Create the final Quote instance with the unique ID
+      let quote = Quote { 
+          id,
+          contributor_id: quotepayload.contributor_id, 
+          author: quotepayload.author, 
+          text: quotepayload.text, 
+          category: quotepayload.category, 
+          created_at: temp_quote.created_at, 
+          updated_at: None 
+      };
+  
+      // Insert the quote into storage
+      do_insert_quote(&quote);
+  
+      Ok(quote)
+  }
+  
 
 
 #[ic_cdk::update]
