@@ -14,7 +14,7 @@ type IdCell = Cell<u64, Memory>;
 #[derive(candid::CandidType, Clone, Serialize, Deserialize)]
 struct Contributor {
     id: u64,
-    user_principal: Principal,
+    contributor_principal: Principal,
     username: String,
     email: String,
     age: u32,
@@ -160,7 +160,7 @@ fn add_contributor(contrib: ContributorPayload) -> Result<Contributor, Error> {
         .expect("cannot increment id counter");
     let contributor = Contributor {
         id,
-        user_principal: caller(),
+        contributor_principal: caller(),
         username: contrib.username,
         email: contrib.email,
         age: contrib.age,
@@ -388,7 +388,7 @@ fn do_insert_quote(quote: &Quote) {
 
 // Helper function to check whether the caller is the owner of the contributor profile
 fn _check_if_owner(contributor: &Contributor) -> Result<(), Error> {
-    if contributor.user_principal.to_string() != caller().to_string() {
+    if contributor.contributor_principal.to_string() != caller().to_string() {
         return Err(Error::AuthenticationFailed {
             msg: format!(
                 "Caller={} isn't the owner of the contributor with id={}",
