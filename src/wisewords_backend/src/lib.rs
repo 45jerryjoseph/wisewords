@@ -144,6 +144,10 @@ fn _get_contributor(id: &u64) -> Option<Contributor> {
 
 #[ic_cdk::update]
 fn add_contributor(contrib: ContributorPayload) -> Option<Contributor> {
+    //Input validation
+    if contrib.username.is_empty() || contrib.email.is_empty() || contrib.age <= 0 {
+        return None;
+    }
     let id = CONTRIBUTOR_ID_COUNTER
         .with(|counter| {
             let current_value = *counter.borrow().get();
@@ -164,6 +168,13 @@ fn add_contributor(contrib: ContributorPayload) -> Option<Contributor> {
 
 #[ic_cdk::update]
 fn update_contributor(id: u64, payload: ContributorPayload) -> Result<Contributor, Error> {
+
+       // Perform input validation
+    if payload.username.is_empty() || payload.email.is_empty() || payload.age <= 0 {
+        return Err(Error::InvalidInput {
+            msg: "Invalid payload data".to_string(),
+        });
+    }
     match CONTRIBUTOR_STORAGE.with(|service| service.borrow().get(&id)) {
         Some(mut contributor) => {
             contributor.username = payload.username;
@@ -288,6 +299,11 @@ fn get_recent_quotes() -> Result<Vec<Quote>, Error> {
 #[ic_cdk::update]
 
 fn add_quote(quotepayload: QuotePayload) -> Option<Quote> {
+
+     // Perform input validation
+     if quotepayload.author.is_empty() || quotepayload.text.is_empty() || quotepayload.category.is_empty() {
+        return None;
+    }
     let id = QUOTE_ID_COUNTER
         .with(|counter| {
             let current_value = *counter.borrow().get();
@@ -310,6 +326,12 @@ fn add_quote(quotepayload: QuotePayload) -> Option<Quote> {
 
 #[ic_cdk::update]
 fn update_quote(id: u64, payload: QuotePayload) -> Result<Quote, Error> {
+       // Perform input validation
+    if payload.author.is_empty() || payload.text.is_empty() || payload.category.is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Invalid payload data".to_string(),
+        });
+    }
     match QUOTE_STORAGE.with(|service| service.borrow().get(&id)) {
         Some(mut quote) => {
             quote.contributor_id = payload.contributor_id;
@@ -353,6 +375,7 @@ fn delete_quote(id: u64) -> Result<Quote, Error> {
 #[derive(candid::CandidType, Deserialize, Serialize)]
 enum Error {
     NotFound { msg: String },
+    InvalidInput { msg: String },
 }
 
 

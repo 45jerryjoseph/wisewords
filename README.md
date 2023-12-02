@@ -98,15 +98,28 @@ dfx canister --help
 ```
 
 ## Running the project locally
+When run `dfx deploy` or  `npm run gen-deploy`
+and encounter error as below 
+```bash
+[webpack-cli] Error: Cannot find module 'dotenv'
+
+  # solution run:
+
+npm install
+```
 
 If you want to test your project locally, you can use the following commands:
 
 ```bash
 # Starts the replica, running in the background
 dfx start --background
+  or
+dfx start --background --clean
 
 # Deploys your canisters to the replica and generates your candid interface
 dfx deploy
+  or
+npm run gen-deploy
 ```
 
 Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.

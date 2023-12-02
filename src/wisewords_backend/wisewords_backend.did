@@ -7,7 +7,10 @@ type Contributor = record {
   email : text;
 };
 type ContributorPayload = record { age : nat32; username : text; email : text };
-type Error = variant { NotFound : record { msg : text } };
+type Error = variant {
+  InvalidInput : record { msg : text };
+  NotFound : record { msg : text };
+};
 type Quote = record {
   id : nat64;
   updated_at : opt nat64;
