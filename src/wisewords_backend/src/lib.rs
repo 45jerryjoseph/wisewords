@@ -224,7 +224,7 @@ fn delete_contributor(id: u64) -> Result<Contributor, Error> {
         Some(contributor) => Ok(contributor),
         None => Err(Error::NotFound {
             msg: format!(
-                "couldn't delete a message with id={}. message not found.",
+                "couldn't delete a contributor with id={}. contributor not found.",
                 id
             ),
         }),
@@ -257,7 +257,7 @@ fn get_quote(id: u64) -> Result<Quote, Error> {
         }),
     }
 }
-// a helper method to get a contributor by id.
+// a helper method to get a quote by id.
 fn _get_quote(id: &u64) -> Option<Quote> {
     QUOTE_STORAGE.with(|service| service.borrow().get(id))
 }
@@ -413,7 +413,7 @@ fn delete_quote(id: u64) -> Result<Quote, Error> {
         Some(quote) => Ok(quote),
         None => Err(Error::NotFound {
             msg: format!(
-                "couldn't delete a message with id={}. message not found.",
+                "couldn't delete a Quote with id={}. Quote not found.",
                 id
             ),
         }),
